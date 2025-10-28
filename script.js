@@ -92,30 +92,39 @@ function selectDefinition(defEl) {
   if (correct) {
     selectedTerm.classList.add("matched");
     defEl.classList.add("matched");
+
     // animate matched color & small pop
     gsap.to([selectedTerm, defEl], {
       backgroundColor: "#00ff99",
       duration: 0.25
     });
-    gsap.fromTo([selectedTerm, defEl], { scale: 1.05 }, { scale: 1, duration: 0.35, ease: "elastic.out(1, 0.5)" });
+    gsap.fromTo([selectedTerm, defEl],
+      { scale: 1.05 },
+      { scale: 1, duration: 0.35, ease: "elastic.out(1, 0.5)" }
+    );
 
     matches++;
     if (matches === pairs.length) showWin();
+
   } else {
     // wrong: flash red then revert
-    gsap.to([selectedTerm, defEl], {
+    const termToUnselect = selectedTerm; // keep reference
+    gsap.to([termToUnselect, defEl], {
       backgroundColor: "#ff3333",
       duration: 0.25,
       yoyo: true,
       repeat: 1,
       onComplete: () => {
-        // revert selected state if not matched
-        selectedTerm.classList.remove("selected");
+        // revert selected state safely
+        if (termToUnselect) termToUnselect.classList.remove("selected");
       }
     });
   }
+
+  // clear selection state
   selectedTerm = null;
 }
+
 
 // ----------------- Line Drawing -----------------
 function drawLine(termEl, defEl, correct) {
